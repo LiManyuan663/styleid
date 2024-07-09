@@ -1,0 +1,6 @@
+__pycache__
+precomputed_feats
+output
+.ipynb_checkpoints
+data
+data_vis
