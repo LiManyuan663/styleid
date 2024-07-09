@@ -10,7 +10,7 @@ from contextlib import nullcontext
 import copy
 
 from ldm.util import instantiate_from_config
-from ldm.models.diffusion.ddim import DDIMSampler
+from ldm.models.diffusion.ddim0 import DDIMSampler
 
 import torchvision.transforms as transforms
 import torch.nn.functional as F
