@@ -271,14 +271,14 @@ def main():
                         img = Image.fromarray(x_sample.astype(np.uint8))
 
                         img.save(os.path.join(output_path, output_name))
-                        # if len(feat_path_root) > 0:
-                        #     print("Save features")
-                        #     if not os.path.isfile(cnt_feat_name):
-                        #         with open(cnt_feat_name, 'wb') as h:
-                        #             pickle.dump(cnt_feat, h)
-                        #     if not os.path.isfile(sty_feat_name):
-                        #         with open(sty_feat_name, 'wb') as h:
-                        #             pickle.dump(sty_feat, h)
+                        if len(feat_path_root) > 0:
+                            print("Save features")
+                            if not os.path.isfile(cnt_feat_name):
+                                with open(cnt_feat_name, 'wb') as h:
+                                    pickle.dump(cnt_feat, h)
+                            if not os.path.isfile(sty_feat_name):
+                                with open(sty_feat_name, 'wb') as h:
+                                    pickle.dump(sty_feat, h)
     print("=========================================================")
     print(f"Total end: {time.time() - begin}")
 
