@@ -16,9 +16,9 @@ def get_args():
     parse.add_argument('--sd_version', type=float, choices=[1.4, 1.5, 2.1], default=2.1)
     
     # path of content and style iamges
-    parse.add_argument('--cnt_fn', type=str, required=True)
-    parse.add_argument('--sty_fn', type=str, required=True)
-    parse.add_argument('--save_dir', type=str, default='results')
+    parse.add_argument('--cnt_fn', type=str,default='data/cnt/00.png')
+    parse.add_argument('--sty_fn', type=str, default='data/sty/00.png')
+    parse.add_argument('--save_dir', type=str, default='output')
     
     cfg = parse.parse_args()
     return cfg

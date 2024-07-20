@@ -225,7 +225,7 @@ if __name__ == "__main__":
     # options
     ddim_steps = cfg.ddim_steps
     device = "cuda"
-    dtype = torch.float16
+    dtype = torch.float32
     in_c = 4
     guidance_scale = 0. # no text
     

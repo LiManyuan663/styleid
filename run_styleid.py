@@ -107,8 +107,8 @@ def main():
     parser.add_argument('--model_config', type=str, default='models/ldm/stable-diffusion-v2/v2-inference.yaml', help='model config')
     # parser.add_argument('--model_config', type=str, default='models/ldm/stable-diffusion-v1/v1-inference.yaml', help='model config')
     parser.add_argument('--precomputed', type=str, default='./precomputed_feats', help='save path for precomputed feature')
-    parser.add_argument('--ckpt', type=str, default='/root/autodl-tmp/huggingface/hub/models--stabilityai--stable-diffusion-2-1/snapshots/5cae40e6a2745ae2b01ad92ae5043f95f23644d6/v2-1_768-ema-pruned.ckpt')
-    # parser.add_argument('--ckpt', type=str, default='/root/autodl-tmp/huggingface/hub/models--stabilityai--stable-diffusion-2-1-base/snapshots/5ede9e4bf3e3fd1cb0ef2f7a3fff13ee514fdf06/v2-1_512-ema-pruned.ckpt', help='model checkpoint')
+    # parser.add_argument('--ckpt', type=str, default='/root/autodl-tmp/huggingface/hub/models--stabilityai--stable-diffusion-2-1/snapshots/5cae40e6a2745ae2b01ad92ae5043f95f23644d6/v2-1_768-ema-pruned.ckpt')
+    parser.add_argument('--ckpt', type=str, default='/root/autodl-tmp/huggingface/hub/models--stabilityai--stable-diffusion-2-1-base/snapshots/5ede9e4bf3e3fd1cb0ef2f7a3fff13ee514fdf06/v2-1_512-ema-pruned.ckpt', help='model checkpoint')
     parser.add_argument('--precision', type=str, default='autocast', help='choices: ["full", "autocast"]')
     parser.add_argument('--output_path', type=str, default='output')
     parser.add_argument("--without_init_adain", action='store_true')
@@ -258,7 +258,7 @@ def main():
                                                         unconditional_conditioning=uc,
                                                         eta=opt.ddim_eta,
                                                         x_T=adain_z_enc,
-                                                        injected_features=None,
+                                                        injected_features=feat_maps,
                                                         start_step=start_step,
                                                         )
                         print("====sample结束=======")
@@ -273,12 +273,12 @@ def main():
                         img.save(os.path.join(output_path, output_name))
                         if len(feat_path_root) > 0:
                             print("Save features")
-                            # if not os.path.isfile(cnt_feat_name):
-                            #     with open(cnt_feat_name, 'wb') as h:
-                            #         pickle.dump(cnt_feat, h)
-                            # if not os.path.isfile(sty_feat_name):
-                            #     with open(sty_feat_name, 'wb') as h:
-                            #         pickle.dump(sty_feat, h)
+                            if not os.path.isfile(cnt_feat_name):
+                                with open(cnt_feat_name, 'wb') as h:
+                                    pickle.dump(cnt_feat, h)
+                            if not os.path.isfile(sty_feat_name):
+                                with open(sty_feat_name, 'wb') as h:
+                                    pickle.dump(sty_feat, h)
     print("=========================================================")
     print(f"Total end: {time.time() - begin}")
 
