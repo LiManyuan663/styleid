@@ -3,13 +3,13 @@ import torch
 from transformers import CLIPTextModel, CLIPTokenizer
 from diffusers import AutoencoderKL, UNet2DConditionModel, PNDMScheduler, StableDiffusionPipeline
 
-from diffusers import LMSDiscreteScheduler, DDIMScheduler
+from diffusers import LMSDiscreteScheduler, DDIMScheduler,DDIMInverseScheduler, DPMSolverMultistepScheduler
 
 
 # From "https://huggingface.co/blog/stable_diffusion"
 def load_stable_diffusion(sd_version='2.1', precision_t=torch.float32, device="cuda"):
     if sd_version == '2.1':
-        model_key = "stabilityai/stable-diffusion-2-1-base"
+        model_key = "stabilityai/stable-diffusion-2-1"
     elif sd_version == '2.0':
         model_key = "stabilityai/stable-diffusion-2-base"
     elif sd_version == '1.5':
@@ -33,8 +33,8 @@ def load_stable_diffusion(sd_version='2.1', precision_t=torch.float32, device="c
     del pipe
     
     # Use DDIM scheduler
-    scheduler = DDIMScheduler.from_pretrained(model_key, subfolder="scheduler", torch_dtype=precision_t)
-    
+    # scheduler = DDIMInverseScheduler.from_pretrained(model_key, subfolder="scheduler", torch_dtype=precision_t)
+    scheduler = DPMSolverMultistepScheduler.from_config(model_key, subfolder="scheduler", torch_dtype=precision_t)
     return vae, tokenizer, text_encoder, unet, scheduler
 
 def decode_latent(latents, vae):

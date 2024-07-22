@@ -12,7 +12,7 @@ def get_args():
     parse.add_argument('--layers', nargs='+', type=int, default=[7, 8, 9, 10, 11])
     
     # hyperparameters of diffusion model
-    parse.add_argument('--ddim_steps', type=int, default=20)
+    parse.add_argument('--ddim_steps', type=int, default=10)
     parse.add_argument('--sd_version', type=float, choices=[1.4, 1.5, 2.1], default=2.1)
     
     # path of content and style iamges
