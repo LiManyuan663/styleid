@@ -6,6 +6,7 @@ from utils import * # image save utils
 
 from stable_diffusion import load_stable_diffusion, encode_latent, decode_latent, get_text_embedding, get_unet_layers, attention_op  # load SD
 import copy
+from diffusers import StableDiffusionPipeline, DDIMScheduler,DDIMInverseScheduler
 
 # For visualizing features
 from sklearn.cluster import KMeans
@@ -157,26 +158,26 @@ class style_transfer_module():
                     noisy_residual = noise_pred_uncond + guidance_scale * (noise_pred_text - noise_pred_uncond)
                     input, _ = input.chunk(2)
 
-                current_t = max(0, t.item() - (1000//num_inference_steps)) #t
-                next_t = t # min(999, t.item() + (1000//num_inference_steps)) # t+1
-                alpha_t = self.scheduler.alphas_cumprod[current_t]
-                alpha_t_next = self.scheduler.alphas_cumprod[next_t]
-
-                latents = input
-                latents = (latents - (1-alpha_t).sqrt()*noise_pred)*(alpha_t_next.sqrt()/alpha_t.sqrt()) + (1-alpha_t_next).sqrt()*noise_pred
-
-                # current_t = t - 1000 // num_inference_steps
-                # next_t = t
+                # current_t = max(0, t.item() - (1000//num_inference_steps)) #t
+                # next_t = t # min(999, t.item() + (1000//num_inference_steps)) # t+1
                 # alpha_t = self.scheduler.alphas_cumprod[current_t]
-                # alpha_t_next = self.scheduler.alphas_cumprod[next_t] if next_t >= 0 else self.scheduler.final_alpha_cumprod
-                # beta_t = 1 - alpha_t
-                
+                # alpha_t_next = self.scheduler.alphas_cumprod[next_t]
+
                 # latents = input
-                # pred_original_sample = (alpha_t**0.5) * latents - (beta_t**0.5) * noise_pred
-                # pred_epsilon = (alpha_t**0.5) * noise_pred + (beta_t**0.5) * latents
-                # pred_sample_direction = (1 - alpha_t_next) ** (0.5) * pred_epsilon
-                # # Inverted update step (re-arranging the update step to get x(t) (new latents) as a function of x(t-1) (current latents) 
-                # latents = alpha_t_next ** (0.5) * pred_original_sample + pred_sample_direction
+                # latents = (latents - (1-alpha_t).sqrt()*noise_pred)*(alpha_t_next.sqrt()/alpha_t.sqrt()) + (1-alpha_t_next).sqrt()*noise_pred
+
+                current_t = t - 1000 // num_inference_steps
+                next_t = t
+                alpha_t = self.scheduler.alphas_cumprod[current_t]
+                alpha_t_next = self.scheduler.alphas_cumprod[next_t] if next_t >= 0 else self.scheduler.final_alpha_cumprod
+                beta_t = 1 - alpha_t
+                
+                latents = input
+                pred_original_sample = (alpha_t**0.5) * latents - (beta_t**0.5) * noise_pred
+                pred_epsilon = (alpha_t**0.5) * noise_pred + (beta_t**0.5) * latents
+                pred_sample_direction = (1 - alpha_t_next) ** (0.5) * pred_epsilon
+                # Inverted update step (re-arranging the update step to get x(t) (new latents) as a function of x(t-1) (current latents) 
+                latents = alpha_t_next ** (0.5) * pred_original_sample + pred_sample_direction
                 input = latents
                 
                 pred_latents.append(latents)
@@ -351,4 +352,9 @@ if __name__ == "__main__":
 
     save_image(images, os.path.join(save_dir, "reverse_stylized.jpg"))
     save_image(image_last, os.path.join(save_dir, "stylized_image.jpg"))
+
+    pipe = StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2-1").to(device,torch_dtype=torch.float16)
+    pipe.scheduler = DDIMScheduler.from_config(pipe.scheduler.config)
+    test_img = pipe('Watercolor painting of a beach sunset', latents=latent_cs, num_inference_steps=50, guidance_scale=3.5).images[0]
+    test_img.save(os.path.join(save_dir, "test.jpg"))
     
