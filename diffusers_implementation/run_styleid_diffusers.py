@@ -126,7 +126,7 @@ class style_transfer_module():
 
         pred_images = []
         pred_latents = []
-        
+        # latents = input.clone()
         decode_kwargs = {'vae': vae}
 
         # Reversed timesteps <<<<<<<<<<<<<<<<<<<<
@@ -163,9 +163,20 @@ class style_transfer_module():
                 alpha_t_next = self.scheduler.alphas_cumprod[next_t]
 
                 latents = input
-                # Inverted update step (re-arranging the update step to get x(t) (new latents) as a function of x(t-1) (current latents)
                 latents = (latents - (1-alpha_t).sqrt()*noise_pred)*(alpha_t_next.sqrt()/alpha_t.sqrt()) + (1-alpha_t_next).sqrt()*noise_pred
+
+                # current_t = t - 1000 // num_inference_steps
+                # next_t = t
+                # alpha_t = self.scheduler.alphas_cumprod[current_t]
+                # alpha_t_next = self.scheduler.alphas_cumprod[next_t] if next_t >= 0 else self.scheduler.final_alpha_cumprod
+                # beta_t = 1 - alpha_t
                 
+                # latents = input
+                # pred_original_sample = (alpha_t**0.5) * latents - (beta_t**0.5) * noise_pred
+                # pred_epsilon = (alpha_t**0.5) * noise_pred + (beta_t**0.5) * latents
+                # pred_sample_direction = (1 - alpha_t_next) ** (0.5) * pred_epsilon
+                # # Inverted update step (re-arranging the update step to get x(t) (new latents) as a function of x(t-1) (current latents) 
+                # latents = alpha_t_next ** (0.5) * pred_original_sample + pred_sample_direction
                 input = latents
                 
                 pred_latents.append(latents)
@@ -297,7 +308,7 @@ if __name__ == "__main__":
     image_last = images[-1]
     images = np.concatenate(images, axis=1)
 
-    save_image(images, os.path.join(save_dir, "intermediate/inversion_style.jpg"))
+    save_image(images, os.path.join(save_dir, "intermediate/inversion_content.jpg"))
     save_image(image_last, os.path.join(save_dir, "intermediate/latent_content.jpg"))
     
     # ================= IMPORTANT =================
